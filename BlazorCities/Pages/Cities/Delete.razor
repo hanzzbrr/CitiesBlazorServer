@@ -50,10 +50,10 @@
     protected async void DeleteCity()
     {
         await _citiesService.DeleteCityAsync(_city);
-        _navigationManager.NavigateTo("Cities");
+        _navigationManager.NavigateTo("/");
     }
     void CancelDelete()
     {
-        _navigationManager.NavigateTo("Cities");
+        _navigationManager.NavigateTo("/");
     }
 }

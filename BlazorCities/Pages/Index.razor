@@ -1,7 +1,57 @@
 ﻿@page "/"
+@using BlazorCities.Data
+@inject BlazorCities.Services.CitiesService citiesService
 
-<h1>Hello, world!</h1>
+<NavLink class="nav-link" href="Cities/Add">
+    <span class="oi oi-plus" aria-hidden="true">Add new</span>
 
-Welcome to your new app.
+</NavLink>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<h3>Cities</h3>
+
+@if (CitiesObj is null)
+{
+    <p><em>Loading... !</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Foundation date</th>
+                <th>Population</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (City city in CitiesObj)
+            {
+                <tr>
+                    <td>@city.ID</td>
+                    <td>@city.Name</td>
+                    <td>@city.FoundationDate</td>
+                    <td>@city.Population</td>
+                    <td>
+                        <a class="nav-link" href="Cities/Edit/@city.ID">
+                            <span class="oi oi-pencil" aria-hidden="true">Edit</span>
+                        </a>
+                        <a class="nav-link" href="Cities/Delete/@city.ID">
+                            <span class="oi oi-trash" aria-hidden="true">Delete</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    IEnumerable<City> CitiesObj;
+    protected override async Task OnInitializedAsync()
+    {
+        CitiesObj = await Task.Run(() => citiesService.GetCitiesAsync());
+    }
+}
