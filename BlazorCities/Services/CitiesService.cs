@@ -34,6 +34,7 @@ namespace BlazorCities.Services
         {
             await _dbContext.Cities.AddAsync(city);
             await _dbContext.SaveChangesAsync();
+            await _hubContext.Clients.All.SendCities(_dbContext.Cities);
             return true;
         }
 
@@ -49,6 +50,7 @@ namespace BlazorCities.Services
         {
             _dbContext.Remove(city);
             await _dbContext.SaveChangesAsync();
+            await _hubContext.Clients.All.SendCities(_dbContext.Cities);
             return true;
         }
 
