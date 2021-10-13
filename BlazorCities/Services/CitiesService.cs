@@ -54,6 +54,11 @@ namespace BlazorCities.Services
             return true;
         }
 
+        public async Task<int> GetMaxId()
+        {                        
+            return await _dbContext.Cities.MaxAsync(c => c.ID);
+        }
+
         
     }
 }

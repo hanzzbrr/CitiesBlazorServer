@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-8">
             <div class="form-group">
-                <input form="Name" class="form-control" @bind="@_city.ID" />
+                <label for="Name" class="control-label">City ID: @_city.ID</label>
             </div>
             <div class="form-group">
                 <label for="Name" class="control-label">Name</label>
@@ -41,7 +41,7 @@
 @code {
     [Parameter]
     public string Id { get; set; }
-    City _city = new City();
+    City _city = new ();
     protected override async Task OnInitializedAsync()
     {
         _city = await Task.Run(() => _citiesService.GetCityAsync(Convert.ToInt32(Id)));

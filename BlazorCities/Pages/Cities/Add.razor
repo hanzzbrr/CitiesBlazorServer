@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-8">
             <div class="form-group">
-                <input form="Name" class="form-control" @bind="@_city.ID" />
+                <label for="Name" class="control-label">@_newId</label>                
             </div>
             <div class="form-group">
                 <label for="Name" class="control-label">Name</label>
@@ -39,9 +39,18 @@
 </form>
 
 @code {
-    City _city = new City();
+    City _city = new ();
+    int _newId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _newId = await Task.Run(() => _citiesService.GetMaxId());
+        _newId++;
+    }
+
     protected async void AddCity()
     {
+        _city.ID = _newId;
         await _citiesService.InsertCityAsync(_city);
         _navigationManager.NavigateTo("/");
     }
