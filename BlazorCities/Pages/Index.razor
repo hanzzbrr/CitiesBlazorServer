@@ -62,22 +62,15 @@ else
             .WithUrl(_navigationManager.ToAbsoluteUri("/citieshub"))
             .Build();
 
-        _hubConnection.On<IEnumerable<City>>("GetCities", (cities) =>
+        _hubConnection.On<IEnumerable<City>>("SendCities", (cities) =>
         {
             _cities = cities;
             StateHasChanged();
         });
 
-        _hubConnection.On<City>("UpdateCity", (city) =>
-        {
-            var updateCity = _cities.FirstOrDefault(x => x.ID == city.ID);
-            updateCity = city;
-        });
-
-        //_cities = await Task.Run(() => _citiesService.GetCitiesAsync());
-
         await _hubConnection.StartAsync();
-
+        _cities = await Task.Run(() => _citiesService.GetCitiesAsync());
+        StateHasChanged();
 
     }
 

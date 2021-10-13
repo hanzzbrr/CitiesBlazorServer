@@ -41,7 +41,7 @@ namespace BlazorCities.Services
         {
             _dbContext.Cities.Update(city);
             await _dbContext.SaveChangesAsync();
-            await _hubContext.Clients.All.Update(city);
+            await _hubContext.Clients.All.SendCities(_dbContext.Cities);
             return true;
         }
 
