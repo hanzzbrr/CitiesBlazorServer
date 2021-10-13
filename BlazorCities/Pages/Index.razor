@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
 @using BlazorCities.Data
-@inject BlazorCities.Services.CitiesService citiesService
+@inject NavigationManager _navigationManager
+@inject BlazorCities.Services.CitiesService _citiesService
+@implements IAsyncDisposable
 
 <NavLink class="nav-link" href="Cities/Add">
     <span class="oi oi-plus" aria-hidden="true">Add new</span>
@@ -9,7 +12,7 @@
 
 <h3>Cities</h3>
 
-@if (CitiesObj is null)
+@if (_cities is null)
 {
     <p><em>Loading... !</em></p>
 }
@@ -26,7 +29,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (City city in CitiesObj)
+            @foreach (City city in _cities)
             {
                 <tr>
                     <td>@city.ID</td>
@@ -49,9 +52,40 @@ else
 
 
 @code {
-    IEnumerable<City> CitiesObj;
+    private HubConnection _hubConnection;
+    IEnumerable<City> _cities;
+
+
     protected override async Task OnInitializedAsync()
     {
-        CitiesObj = await Task.Run(() => citiesService.GetCitiesAsync());
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/citieshub"))
+            .Build();
+
+        _hubConnection.On<IEnumerable<City>>("GetCities", (cities) =>
+        {
+            _cities = cities;
+            StateHasChanged();
+        });
+
+        _hubConnection.On<City>("UpdateCity", (city) =>
+        {
+            var updateCity = _cities.FirstOrDefault(x => x.ID == city.ID);
+            updateCity = city;
+        });
+
+        //_cities = await Task.Run(() => _citiesService.GetCitiesAsync());
+
+        await _hubConnection.StartAsync();
+
+
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if(_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
     }
 }

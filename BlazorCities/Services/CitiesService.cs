@@ -1,4 +1,6 @@
 ﻿using BlazorCities.Data;
+using BlazorCities.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,10 +12,12 @@ namespace BlazorCities.Services
     public class CitiesService
     {
         private readonly DataContext _dbContext;
+        private readonly IHubContext<CitiesHub, ICitiesHub> _hubContext;
 
-        public CitiesService(DataContext dbContext)
+        public CitiesService(DataContext dbContext, IHubContext<CitiesHub, ICitiesHub> hubContext)
         {
             _dbContext = dbContext;
+            _hubContext = hubContext;
         }
 
         public async Task<IEnumerable<City>> GetCitiesAsync()
@@ -37,6 +41,7 @@ namespace BlazorCities.Services
         {
             _dbContext.Cities.Update(city);
             await _dbContext.SaveChangesAsync();
+            await _hubContext.Clients.All.Update(city);
             return true;
         }
 
